@@ -131,41 +131,97 @@ win.HighchartsAdapter = {
   // note: gets actually called with any number of hashes, not just 2...
   // note: objects must always be copied, never assigned (or you get weird data sharing and side-effects)
   merge: (function() {
+
+    // From https://github.com/nrf110/deepmerge/blob/master/index.js
+    var merge2 = function(target, src) {
+      var array = Array.isArray(src);
+      var dst = array && [] || {};
+
+      if (array) {
+          target = target || []
+          dst = dst.concat(target)
+          src.forEach(function(e, i) {
+              if (typeof target[i] === 'undefined') {
+                  dst[i] = e
+              } else if (typeof e === 'object') {
+                  dst[i] = merge(target[i], e)
+              } else {
+                  if (target.indexOf(e) === -1) {
+                      dst.push(e)
+                  }
+              }
+          })
+      } else {
+          if (target && typeof target === 'object') {
+              Object.keys(target).forEach(function (key) {
+                  dst[key] = target[key]
+              })
+          }
+          if (typeof src == "object") {
+            Object.keys(src).forEach(function (key) {
+                if (typeof src[key] !== 'object' || !src[key]) {
+                    dst[key] = src[key]
+                }
+                else {
+                    if (!target[key]) {
+                        dst[key] = src[key]
+                    } else {
+                        dst[key] = merge(target[key], src[key])
+                    }
+                }
+            })
+          }
+      }
+
+      return dst
+    };
+
+
     var merge = function() {
       if (arguments.length == 1) return arguments[0];
 
       var o = {}, i=0, len = arguments.length, obj, k, v;
-
+      
+      //console.log('merge', arguments);
+      
       for(; i<len; i++) {
         obj = arguments[i];
 
-        for(k in obj) {
-          v = obj[k];
-          if (v && typeof v == "object") {
-            if (v.constructor === Array) {
-              // TODO arrays not deep copied
-              o[k] = v;
-            } else {
-              // if (o[k] && typeof o[k] != "object") throw "merging with non-object";
-              // console.log("merging "+k);
-              o[k] = merge(o[k] || {}, obj[k]);
-            }
-            // console.log(o[k]);
-            // console.log(obj[k]);
-            // console.log(o[k]);
-          }
-          else {
-            // if (typeof o[k] != "undefined") console.log("setting "+k+" "+o[k]+" "+obj[k]);
-            // if (obj[k] && typeof obj[k] == "object") throw "don't assign objects";
-            o[k] = obj[k];
-          }
-        }
+        o = merge2(o, obj);
+
+        // for(k in obj) {
+        //   v = obj[k];
+        //   if (v && typeof v == "object") {
+        //     if (v.constructor === Array) {
+        //       // TODO arrays not deep copied
+        //       o[k] = v;
+        //     } else {
+        //       // if (o[k] && typeof o[k] != "object") throw "merging with non-object";
+        //       //
+
+
+        //        console.log("merging "+k);
+        //       o[k] = merge(o[k] || {}, obj[k]);
+        //     }
+        //     // console.log(o[k]);
+        //     // console.log(obj[k]);
+        //     // console.log(o[k]);
+        //   }
+        //   else {
+        //     // if (typeof o[k] != "undefined") console.log("setting "+k+" "+o[k]+" "+obj[k]);
+        //     // if (obj[k] && typeof obj[k] == "object") throw "don't assign objects";
+        //     o[k] = obj[k];
+        //   }
+        // }
       }
       return o;
     }
 
     return merge;
   })(),
+
+  
+
 
   /**
    * Add an event listener
