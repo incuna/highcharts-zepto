@@ -1,9 +1,9 @@
 {
   "name": "highcharts-zepto",
-  "description": "Highstock lets you create stock or general timeline charts in pure JavaScript, including sophisticated navigation options like a small navigator series, preset date ranges, date picker, scrolling and panning.",
-  "version": "1.3.2",
+  "description": "This is an adapter for using Zepto.js with Highcharts rather than jQuery.",
+  "version": "1.3.3",
   "author": "Highsoft Solutions AS <support@highcharts.com>",
-  "homepage": "http://www.highcharts.com/products/highstock",
+  "homepage": "http://www.highcharts.com/",
   "keywords": ["charts", "vml", "svg"],
   "repository": {
     "type": "git",
